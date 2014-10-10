@@ -9,6 +9,7 @@ extern uint8_t   UBX_mode;
 extern int32_t   UBX_min;
 extern int32_t   UBX_max;
 extern int32_t   UBX_reference;
+extern uint8_t   UBX_divider;
 extern uint8_t   UBX_limits;
 
 void UBX_Init(void);

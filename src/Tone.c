@@ -128,7 +128,7 @@ void Tone_SetPitch(
 {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		Tone_step = ((int32_t) index * 3242 + 30212096) * TONE_SAMPLE_LEN;
+		Tone_step = ((int32_t) index * 695 + 15106048) * TONE_SAMPLE_LEN;
 	}
 }
 
@@ -137,7 +137,7 @@ void Tone_SetReference(
 {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		Tone_step_ref = ((int32_t) index * 3242 + 30212096) * TONE_SAMPLE_LEN;
+		Tone_step_ref = ((int32_t) index * 695 + 15106048) * TONE_SAMPLE_LEN;
 	}
 }
 
@@ -164,7 +164,30 @@ static void Tone_LoadTable(void)
 		phase     += Tone_step >> 16;
 		phase_ref += Tone_step_ref >> 16;
 
-		phase_ref = ((256 - Tone_lock) * phase_ref + Tone_lock * phase) / 256;
+		if (phase_ref < phase)
+		{
+			uint16_t diff = phase - phase_ref;
+			if (diff < 32768)
+			{
+				phase_ref += (uint16_t) ((Tone_lock * diff) / 65536);
+			}
+			else
+			{
+				phase_ref -= (uint16_t) ((Tone_lock * diff) / 65536);
+			}
+		}
+		else
+		{
+			uint16_t diff = phase_ref - phase;
+			if (diff < 32768)
+			{
+				phase_ref -= (uint16_t) ((Tone_lock * diff) / 65536);
+			}
+			else
+			{
+				phase_ref += (uint16_t) ((Tone_lock * diff) / 65536);
+			}
+		}
 
 		val = 128 - (128 >> Tone_volume) + (val >> Tone_volume);
 		Main_buffer[(Tone_write + i) % TONE_BUFFER_LEN] = val;

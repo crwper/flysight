@@ -19,7 +19,7 @@ static const char Config_default[] PROGMEM = "\
 \r\n\
 ; GPS settings\r\n\
 \r\n\
-Model:     6     ; Dynamic model\r\n\
+Model:     3     ; Dynamic model\r\n\
                  ;   0 = Portable\r\n\
                  ;   2 = Stationary\r\n\
                  ;   3 = Pedestrian\r\n\
@@ -28,11 +28,11 @@ Model:     6     ; Dynamic model\r\n\
                  ;   6 = Airborne with < 1 G acceleration\r\n\
                  ;   7 = Airborne with < 2 G acceleration\r\n\
                  ;   8 = Airborne with < 4 G acceleration\r\n\
-Rate:      200   ; Measurement rate (ms)\r\n\
+Rate:      100   ; Measurement rate (ms)\r\n\
 \r\n\
 ; Tone settings\r\n\
 \r\n\
-Mode:      2     ; Measurement mode\r\n\
+Mode:      0     ; Measurement mode\r\n\
                  ;   0 = Horizontal speed\r\n\
                  ;   1 = Vertical speed\r\n\
                  ;   2 = Glide ratio\r\n\
@@ -41,14 +41,15 @@ Mode:      2     ; Measurement mode\r\n\
 Min:       0     ; Lowest pitch value\r\n\
                  ;   cm/s        in Mode 0, 1, or 4\r\n\
                  ;   ratio * 100 in Mode 2 or 3\r\n\
-Max:       300   ; Highest pitch value\r\n\
+Max:       200   ; Highest pitch value\r\n\
                  ;   cm/s        in Mode 0, 1, or 4\r\n\
                  ;   ratio * 100 in Mode 2 or 3\r\n\
-Reference: 150   ; Reference pitch value\r\n\
+Reference: 100   ; Reference pitch value\r\n\
                  ;   cm/s        in Mode 0, 1, or 4\r\n\
                  ;   ratio * 100 in Mode 2 or 3\r\n\
-Lock:      1     ; Tone lock speed (0-256)\r\n\
-Volume:    6     ; 0 (min) to 8 (max)\r\n\
+Lock:      64    ; Tone lock speed (0-65536)\r\n\
+Divider:   4     ; Beat frequency divider (1-255)\r\n\
+Volume:    8     ; 0 (min) to 8 (max)\r\n\
 \r\n\
 ; Miscellaneous\r\n\
 \r\n\
@@ -65,6 +66,7 @@ static const char Config_Mode[] PROGMEM       = "Mode";
 static const char Config_Min[] PROGMEM        = "Min";
 static const char Config_Max[] PROGMEM        = "Max";
 static const char Config_Reference[] PROGMEM  = "Reference";
+static const char Config_Divider[] PROGMEM    = "Divider";
 static const char Config_Limits[] PROGMEM     = "Limits";
 static const char Config_Lock[] PROGMEM       = "Lock";
 static const char Config_Volume[] PROGMEM     = "Volume";
@@ -141,9 +143,10 @@ void Config_Read(void)
 		HANDLE_VALUE(Config_Min,       UBX_min,          val, TRUE);
 		HANDLE_VALUE(Config_Max,       UBX_max,          val, TRUE);
 		HANDLE_VALUE(Config_Reference, UBX_reference,    val, TRUE);
+		HANDLE_VALUE(Config_Divider,   UBX_divider,      val, val >= 1 && val <= 255);
 		HANDLE_VALUE(Config_Limits,    UBX_limits,       val, val >= 0 && val <= 1);
 		HANDLE_VALUE(Config_Volume,    Tone_volume,      8 - val, val >= 0 && val <= 8);
-		HANDLE_VALUE(Config_Lock,      Tone_lock,        val, val >= 0 && val <= 256);
+		HANDLE_VALUE(Config_Lock,      Tone_lock,        val, val >= 0 && val <= 65536);
 		HANDLE_VALUE(Config_TZ_Offset, Log_tz_offset,    val, TRUE);
 		
 		#undef HANDLE_VALUE

@@ -226,12 +226,13 @@ typedef struct
 }
 UBX_ack_nak;
 
-uint8_t  UBX_model         = 6;
-uint16_t UBX_rate          = 200;
-uint8_t  UBX_mode          = 2;
+uint8_t  UBX_model         = 3;
+uint16_t UBX_rate          = 100;
+uint8_t  UBX_mode          = 0;
 int32_t  UBX_min           = 0;
-int32_t  UBX_max           = 300;
-int32_t  UBX_reference     = 150;
+int32_t  UBX_max           = 200;
+int32_t  UBX_reference     = 100;
+uint8_t  UBX_divider       = 4;
 uint8_t  UBX_limits        = 1;
 
 static uint32_t UBX_time_of_week = 0;
@@ -531,6 +532,7 @@ static void UBX_SetTone(
 			Tone_Start();
 		}
 
+		ref_1 = ((UBX_divider - 1) * val_1 + ref_1) / UBX_divider;
 		Tone_SetReference(TONE_MAX_PITCH * (ref_1 - min_1) / (max_1 - min_1));
 	}
 	else
