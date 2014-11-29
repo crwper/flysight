@@ -249,6 +249,11 @@ void Tone_Stop(void)
 
 void Tone_Task(void)
 {
+	if (Tone_flags & TONE_FLAGS_STOP)
+	{
+		Tone_Stop();
+	}
+
 	if (Tone_flags & TONE_FLAGS_LOAD)
 	{
 		Tone_Load();
