@@ -159,6 +159,10 @@ int main(void)
 		Timer_Init();
 		UBX_Init();
 
+		// Turn off LCD backlight
+		DDRD |= (1 << 6);
+		PORTD &= ~(1 << 6);
+	
 		for (;;)
 		{
 			UBX_Task();
