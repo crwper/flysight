@@ -26,6 +26,7 @@ SRC          = src/Main.c                                                  \
 	           src/Descriptors.c                                           \
 			   src/LCD.c                                                   \
 	           src/Log.c                                                   \
+	           src/Menu.c                                                  \
 	           src/Power.c                                                 \
 	           src/Signature.c                                             \
 	           src/Time.c                                                  \

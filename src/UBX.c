@@ -326,13 +326,7 @@ extern int disk_is_ready(void);
 
 ISR(INT6_vect)
 {
-	static int count = 0;
-	char buf[10];
-
-	sprintf(buf, "%d", ++count);
-	
-	LCD_Clear();
-	LCD_Show(buf);
+	// TODO: Clear ms counter
 }	
 
 void UBX_Update(void)
@@ -1153,8 +1147,8 @@ void UBX_Init(void)
 		while (1);
 	}
 
-	EIMSK = 1 << INT6;					// Enable INT6
-	EICRB = 1 << ISC61 | 1 << ISC60;	// Trigger INT6 on rising edge
+	EIMSK |= 1 << INT6;					// Enable INT6
+	EICRB |= 1 << ISC61 | 1 << ISC60;	// Trigger INT6 on rising edge
 
 	if (UBX_init_mode == 1)			// Speech test
 	{

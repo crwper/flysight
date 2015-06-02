@@ -6,9 +6,10 @@
 #include "Board/LEDs.h"
 #include "Lib/MMC.h"
 #include "Config.h"
-#include "i2cmaster.h"
+#include "LCD.h"
 #include "Log.h"
 #include "Main.h"
+#include "Menu.h"
 #include "Power.h"
 #include "Signature.h"
 #include "Timer.h"
@@ -160,13 +161,18 @@ int main(void)
 		UBX_Init();
 
 		// Turn off LCD backlight
-		DDRD |= (1 << 6);
+		DDRD  |=  (1 << 6);
 		PORTD &= ~(1 << 6);
+		
+		// Enable buttons with pull-up
+		DDRE  &= ~((1 << 4) | (1 << 5));
+		PORTE |=   (1 << 4) | (1 << 5);
 	
 		for (;;)
 		{
 			UBX_Task();
 			Tone_Task();
+			Menu_Task();
 		}
 	}
 }
