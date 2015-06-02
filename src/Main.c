@@ -47,66 +47,6 @@ static void delay_ms(
 	}
 }
 
-static void LCD_Init(void)
-{
-    unsigned char ret;
-    
-	i2c_init();
-
-    ret = i2c_start(0x7C);	// set device address and write mode
-    if (ret)
-	{
-        // Failed to issue start condition, possibly no device found
-        i2c_stop();
-		
-		LEDs_TurnOnLEDs(LEDS_RED | LEDS_GREEN);
-		while (1);
-    }
-	else
-	{
-		i2c_write(0x00);	// Send command to display
-		i2c_write(0x38);	// Function set - 8 bit, 2 line display 5x8, inst table 0
-		delay_ms(10);
-		i2c_write(0x39);	// Function set - 8 bit, 2 line display 5x8, inst table 1
-		delay_ms(10);
-		i2c_write(0x14);	// Set BIAS - 1/5
-//		i2c_write(0x73);	// Set contrast
-		i2c_write(0x5E);	// ICON disp on, Booster on, Contrast high byte 
-		i2c_write(0x6D);	// Follower circuit (internal), amp ratio (6)
-		i2c_write(0x0C);	// Display on
-		i2c_write(0x01);	// Clear display
-		i2c_write(0x06);	// Entry mode set - increment
-		delay_ms(10);
-		i2c_stop();
-    }	
-}
-
-static void LCD_Show(
-	const char *text)
-{
-    unsigned char ret;
-	
-    ret = i2c_start(0x7C);	// set device address and write mode
-    if (ret)
-	{
-        // Failed to issue start condition, possibly no device found
-        i2c_stop();
-		
-		LEDs_TurnOnLEDs(LEDS_RED | LEDS_GREEN);
-		while (1);
-	}
-	else
-	{
-		i2c_write(0x40);
-		while (*text)
-		{
-			i2c_write(*text);
-			++text;
-		}
-		i2c_stop();
-	}
-}
-
 void SetupHardware(void)
 {
 #ifdef MAIN_DEBUG
@@ -143,7 +83,6 @@ void SetupHardware(void)
 	Tone_Init();
 
 	LCD_Init();
-	LCD_Show("Hello world!");
 }
 
 int main(void)

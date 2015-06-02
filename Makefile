@@ -24,6 +24,7 @@ TARGET       = flysight
 SRC          = src/Main.c                                                  \
 	           src/Config.c                                                \
 	           src/Descriptors.c                                           \
+			   src/LCD.c                                                   \
 	           src/Log.c                                                   \
 	           src/Power.c                                                 \
 	           src/Signature.c                                             \

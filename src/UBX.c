@@ -7,6 +7,7 @@
 #include <avr/pgmspace.h>
 
 #include "Board/LEDs.h"
+#include "LCD.h"
 #include "Log.h"
 #include "Main.h"
 #include "Power.h"
@@ -322,6 +323,17 @@ static enum
 UBX_state = st_idle;
 
 extern int disk_is_ready(void);
+
+ISR(INT6_vect)
+{
+	static int count = 0;
+	char buf[10];
+
+	sprintf(buf, "%d", ++count);
+	
+	LCD_Clear();
+	LCD_Show(buf);
+}	
 
 void UBX_Update(void)
 {
@@ -1140,6 +1152,9 @@ void UBX_Init(void)
 		LEDs_ChangeLEDs(LEDS_ALL_LEDS, LEDS_RED);
 		while (1);
 	}
+
+	EIMSK = 1 << INT6;					// Enable INT6
+	EICRB = 1 << ISC61 | 1 << ISC60;	// Trigger INT6 on rising edge
 
 	if (UBX_init_mode == 1)			// Speech test
 	{
