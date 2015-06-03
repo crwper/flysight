@@ -11,6 +11,7 @@ ISR(TIMER3_COMPA_vect)
 {
 	Tone_Update();
 	UBX_Update();
+	Menu_Update();
 
 	if (Timer_timer > 0)
 	{
