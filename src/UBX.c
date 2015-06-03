@@ -1033,7 +1033,7 @@ static void UBX_HandleTimeUTC(void)
 	current->hour  = nav_timeutc->hour;
 	current->min   = nav_timeutc->min;
 	current->sec   = nav_timeutc->sec;
-	
+		
 	UBX_curTime = mk_gmtime(current->year, current->month, current->day, 
 	                        current->hour, current->min, current->sec);
 
