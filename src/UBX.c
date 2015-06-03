@@ -7,10 +7,10 @@
 #include <avr/pgmspace.h>
 
 #include "Board/LEDs.h"
-#include "LCD.h"
 #include "Log.h"
 #include "Main.h"
 #include "Power.h"
+#include "Time.h"
 #include "Timer.h"
 #include "Tone.h"
 #include "uart.h"
@@ -322,11 +322,15 @@ static enum
 }
 UBX_state = st_idle;
 
+volatile uint32_t UBX_curTime        = 0;
+volatile uint16_t UBX_curMillisecond = UBX_MAX_MILLISECOND;
+
 extern int disk_is_ready(void);
 
 ISR(INT6_vect)
 {
-	// TODO: Clear ms counter
+	++UBX_curTime;
+	UBX_curMillisecond = 0;
 }	
 
 void UBX_Update(void)
@@ -370,6 +374,11 @@ void UBX_Update(void)
 		}
 
 		counter = (counter + 1) % 1000;
+	}
+
+	if (UBX_curMillisecond < UBX_MAX_MILLISECOND)
+	{
+		++UBX_curMillisecond;
 	}
 }
 
@@ -1024,6 +1033,9 @@ static void UBX_HandleTimeUTC(void)
 	current->hour  = nav_timeutc->hour;
 	current->min   = nav_timeutc->min;
 	current->sec   = nav_timeutc->sec;
+	
+	UBX_curTime = mk_gmtime(current->year, current->month, current->day, 
+	                        current->hour, current->min, current->sec);
 
 	UBX_ReceiveMessage(UBX_MSG_TIMEUTC, nav_timeutc->iTOW);
 }

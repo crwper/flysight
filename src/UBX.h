@@ -3,7 +3,8 @@
 
 #include <avr/io.h>
 
-#define UBX_MAX_ALARMS 10
+#define UBX_MAX_ALARMS      10
+#define UBX_MAX_MILLISECOND 2000
 
 typedef struct
 {
@@ -42,6 +43,9 @@ extern uint8_t   UBX_sp_decimals;
 
 extern uint8_t   UBX_init_mode;
 extern char      UBX_init_filename[9];
+
+extern volatile uint32_t UBX_curTime;
+extern volatile uint16_t UBX_curMillisecond;
 
 void UBX_Init(void);
 void UBX_Task(void);
