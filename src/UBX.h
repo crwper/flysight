@@ -3,46 +3,7 @@
 
 #include <avr/io.h>
 
-#define UBX_MAX_ALARMS      10
 #define UBX_MAX_MILLISECOND 2000
-
-typedef struct
-{
-	int32_t elev;
-	uint8_t type;
-	char    filename[9];
-}
-UBX_alarm;
-
-extern uint8_t   UBX_model;
-extern uint16_t  UBX_rate;
-extern uint8_t   UBX_mode;
-extern int32_t   UBX_min;
-extern int32_t   UBX_max;
-
-extern uint8_t   UBX_mode_2;
-extern int32_t   UBX_min_2;
-extern int32_t   UBX_max_2;
-extern uint32_t  UBX_min_rate;
-extern uint32_t  UBX_max_rate;
-extern uint8_t   UBX_flatline;
-extern uint8_t   UBX_limits;
-extern uint8_t   UBX_use_sas;
-
-extern uint32_t  UBX_threshold;
-extern uint32_t  UBX_hThreshold;
-
-extern UBX_alarm UBX_alarms[UBX_MAX_ALARMS];
-extern uint8_t   UBX_num_alarms;
-extern uint32_t  UBX_alarm_window;
-
-extern uint8_t   UBX_sp_mode;
-extern uint8_t   UBX_sp_units;
-extern uint16_t  UBX_sp_rate;
-extern uint8_t   UBX_sp_decimals;
-
-extern uint8_t   UBX_init_mode;
-extern char      UBX_init_filename[9];
 
 extern volatile uint32_t UBX_curTime;
 extern volatile uint16_t UBX_curMillisecond;

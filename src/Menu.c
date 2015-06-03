@@ -1,11 +1,18 @@
+#include <stdio.h>
+
 #include <avr/io.h>
 
+#include "FatFS/ff.h"
 #include "LCD.h"
+#include "Log.h"
+#include "Main.h"
+#include "Power.h"
 #include "Time.h"
 #include "Tone.h"
 #include "UBX.h"
 
 #define MENU_FLAGS_PLAY_NEXT 1
+#define MENU_FLAGS_WRITE     2
 
 typedef enum
 {
@@ -51,7 +58,7 @@ void Menu_Task(void)
 	static uint8_t grn_button_prev = 0;
 	uint8_t grn_button;
 
-	char buf[32];
+	char buf[100];
 
 	uint16_t year;
 	uint8_t  month;
@@ -127,7 +134,9 @@ void Menu_Task(void)
 			Menu_start_time_valid = 1;
 
 			Tone_Beep(TONE_MAX_PITCH, 0, 4 * TONE_LENGTH_125_MS);
-
+			
+			Menu_flags |= MENU_FLAGS_WRITE;
+			
 			Menu_state = menu_hold;
 			need_redraw = 1;
 		}
@@ -144,7 +153,33 @@ void Menu_Task(void)
 		}
 
 		Menu_flags &= ~MENU_FLAGS_PLAY_NEXT;
-	}	
+	}
+	
+	if (Tone_IsIdle() && (Menu_flags & MENU_FLAGS_WRITE))
+	{
+		gmtime_r(Menu_start_time, &year, &month, &day, &hour, &min, &sec);
+		sprintf(buf, "%02d-%02d-%02dT%02d:%02d:%02d.%03d\r\n", year, month, day, hour, min, sec, Menu_start_time_ms);
+
+		Power_Hold();
+
+		if (!Log_IsInitialized())
+		{
+			Log_Init(
+				year,
+				month,
+				day,
+				hour,
+				min,
+				sec);
+		}
+
+		f_puts(buf, &Main_file);
+		f_sync(&Main_file);
+		
+		Power_Release();
+
+		Menu_flags &= ~MENU_FLAGS_WRITE;
+	}
 
 	// Check if we need to redraw
 	if (Menu_state == menu_idle_with_fix)

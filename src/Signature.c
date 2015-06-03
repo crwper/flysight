@@ -15,10 +15,6 @@ static const char SignatureHeader[] PROGMEM = "\
 FlySight - http://flysight.ca/\r\n\
 Processor serial number: ";
 
-static const char SignatureFooter[] PROGMEM = "\
-\r\n\
-Firmware version: " FLYSIGHT_VERSION "\r\n";
-
 void Signature_WriteString(const char * string)
 {
     char c;
@@ -50,8 +46,6 @@ void Signature_Write(void)
         Signature_WriteHexNibble(byte >> 4);
         Signature_WriteHexNibble(byte & 0x0f);
     }
-
-    Signature_WriteString(SignatureFooter);
     
     f_close(&Main_file);
 }
