@@ -991,6 +991,11 @@ static void UBX_UpdateAlarms(
 					strcat(UBX_buf, ".wav");
 					Tone_Play(UBX_buf);
 					break;
+				case 9: // load config
+					strcpy(UBX_buf, UBX_alarms[i].filename);
+					strcat(UBX_buf, ".txt");
+					Config_ReadSingle("\\config", UBX_buf);
+					break;
 				}
 				
 				break;

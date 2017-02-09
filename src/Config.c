@@ -176,7 +176,8 @@ Alarm_Type:    0 ; Alarm type\r\n\
                  ;   2 = Chirp up\r\n\
                  ;   3 = Chirp down\r\n\
                  ;   4 = Play file\r\n\
-Alarm_File:    0 ; File to be played\r\n\
+                 ;   9 = Load config\r\n\
+Alarm_File:    0 ; File to be played/loaded\r\n\
 \r\n\
 ; Altitude mode settings\r\n\
 \r\n\
@@ -258,7 +259,7 @@ static void Config_WriteString_P(
 	}
 }
 
-static FRESULT Config_ReadSingle(
+FRESULT Config_ReadSingle(
 	const char *dir,
 	const char *filename)
 {

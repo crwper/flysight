@@ -24,6 +24,8 @@
 #ifndef MGC_CONFIG_H
 #define MGC_CONFIG_H
 
+#include "FatFS/ff.h"
+
 #define CONFIG_FNAME_ADDR ((void *) 0x02)
 #define CONFIG_FNAME_LEN  (13)
 
@@ -31,6 +33,7 @@ extern const char Config_Init_File[];
 
 extern char Config_buf[80];
 
+FRESULT Config_ReadSingle(const char *dir, const char *filename);
 void Config_Read(void);
 
 #endif
