@@ -26,6 +26,8 @@
 
 #include <avr/io.h>
 
+#include "FatFS/ff.h"
+
 #define TONE_RATE_ONE_HZ   65
 #define TONE_RATE_FLATLINE UINT16_MAX
 
@@ -36,6 +38,7 @@
 
 extern uint16_t Tone_volume;
 extern uint16_t Tone_sp_volume;
+extern FIL      Tone_file;
 
 void Tone_Init(void);
 void Tone_Update(void);

@@ -98,7 +98,7 @@ static          uint16_t Tone_len;
 static volatile uint8_t  Tone_state = TONE_STATE_IDLE;
 static          uint8_t  Tone_mode;
 
-static          FIL      Tone_file;
+                FIL      Tone_file;
 
                 uint16_t Tone_volume = 2;
                 uint16_t Tone_sp_volume = 0;

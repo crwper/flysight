@@ -272,12 +272,12 @@ static FRESULT Config_ReadSingle(
 	res = f_chdir(dir);
 	if (res != FR_OK) return res;
 	
-	res = f_open(&Main_file, filename, FA_READ);
+	res = f_open(&Tone_file, filename, FA_READ);
 	if (res != FR_OK) return res;
 
-	while (!f_eof(&Main_file))
+	while (!f_eof(&Tone_file))
 	{
-		f_gets(Config_buf, sizeof(Config_buf), &Main_file);
+		f_gets(Config_buf, sizeof(Config_buf), &Tone_file);
 
 		len = strcspn(Config_buf, ";");
 		Config_buf[len] = 0;
@@ -360,7 +360,7 @@ static FRESULT Config_ReadSingle(
 		}
 	}
 	
-	f_close(&Main_file);
+	f_close(&Tone_file);
 	
 	return FR_OK;
 }
@@ -374,7 +374,7 @@ void Config_Read(void)
 	if (res != FR_OK)
 	{
 		res = f_chdir("\\");
-		res = f_open(&Main_file, "config.txt", FA_WRITE | FA_CREATE_ALWAYS);
+		res = f_open(&Tone_file, "config.txt", FA_WRITE | FA_CREATE_ALWAYS);
 		if (res != FR_OK) 
 		{
 			Main_activeLED = LEDS_RED;
@@ -382,8 +382,8 @@ void Config_Read(void)
 			return ;
 		}
 
-		Config_WriteString_P(Config_default, &Main_file);
-		f_close(&Main_file);
+		Config_WriteString_P(Config_default, &Tone_file);
+		f_close(&Tone_file);
 	}
 
 	eeprom_read_block(UBX_buf, CONFIG_FNAME_ADDR, CONFIG_FNAME_LEN);
