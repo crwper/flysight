@@ -276,6 +276,9 @@ FRESULT Config_ReadSingle(
 	res = f_open(&Tone_file, filename, FA_READ);
 	if (res != FR_OK) return res;
 
+	UBX_num_alarms = 0;
+	UBX_num_windows = 0;
+
 	while (!f_eof(&Tone_file))
 	{
 		f_gets(Config_buf, sizeof(Config_buf), &Tone_file);
