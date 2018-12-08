@@ -1,7 +1,7 @@
 /***************************************************************************
 **                                                                        **
 **  FlySight firmware                                                     **
-**  Copyright 2018 Michael Cooper                                         **
+**  Copyright 2018 Michael Cooper, Luke Hederman                          **
 **                                                                        **
 **  This program is free software: you can redistribute it and/or modify  **
 **  it under the terms of the GNU General Public License as published by  **
@@ -101,6 +101,13 @@ extern uint32_t  UBX_alt_step;
 
 extern uint8_t   UBX_init_mode;
 extern char      UBX_init_filename[9];
+
+extern int32_t   UBX_dLat;
+extern int32_t   UBX_dLon;
+extern int16_t   UBX_bearing;
+extern uint16_t  UBX_end_nav;
+extern uint16_t  UBX_max_dist;
+extern uint16_t  UBX_min_angle;
 
 extern UBX_buffer_t UBX_buffer;
 
