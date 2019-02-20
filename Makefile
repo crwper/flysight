@@ -36,6 +36,7 @@ OPTIMIZATION = s
 TARGET       = flysight
 SRC          = src/Main.c                                                  \
 	           src/Config.c                                                \
+	           src/csiphash.c                                              \
 	           src/Debug.c                                                 \
 	           src/Descriptors.c                                           \
 	           src/Log.c                                                   \

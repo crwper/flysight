@@ -103,6 +103,29 @@ char *Log_WriteInt32ToBuf(
 	return ptr;
 }
 
+char *Log_WriteHex64ToBuf(
+	char     *ptr,
+	uint64_t val)
+{
+	uint8_t i, b;
+
+    for (i = 0; i < 16; ++i)
+    {
+		b = val % 16;
+		if (b < 10)
+		{
+			*--ptr = b + '0';
+		}
+		else
+		{
+			*--ptr = b - 10 + 'a';
+		}
+        val /= 16;
+    }
+
+	return ptr;
+}
+
 static void Log_ToDate(
 	char    *name, 
 	uint8_t a, 

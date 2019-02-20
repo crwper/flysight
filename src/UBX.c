@@ -306,6 +306,7 @@ static enum
 UBX_state = st_idle;
 
 extern int disk_is_ready(void);
+extern uint64_t siphash24(const char *in, unsigned long inlen, const char k[16]);
 
 void UBX_Update(void)
 {
@@ -759,10 +760,12 @@ void UBX_Init(void)
 
 void UBX_Task(void)
 {
+	static char key[16] = "abcdefghijklmnop";
+
 	unsigned int ch;
 
 	UBX_saved_t *current;
-	char *ptr;
+	char *ptr, *hash;
 
 	while (!((ch = uart_getc()) & UART_NO_DATA))
 	{
@@ -783,9 +786,13 @@ void UBX_Task(void)
 
 			ptr = UBX_buf + sizeof(UBX_buf);
 			*(--ptr) = 0;
-
 			*(--ptr) = '\n';
-			ptr = Log_WriteInt32ToBuf(ptr, current->numSV,     0, 0, '\r');
+			*(--ptr) = '\r';
+
+			hash = ptr;
+			ptr -= 16;
+
+			ptr = Log_WriteInt32ToBuf(ptr, current->numSV,     0, 0, ',');
 			ptr = Log_WriteInt32ToBuf(ptr, current->gpsFix,    0, 0, ',');
 			ptr = Log_WriteInt32ToBuf(ptr, current->cAcc,   5, 1, ',');
 			ptr = Log_WriteInt32ToBuf(ptr, current->heading, 5, 1, ',');
@@ -807,6 +814,8 @@ void UBX_Task(void)
 			ptr = Log_WriteInt32ToBuf(ptr, current->month, 2, 0, '-');
 			ptr = Log_WriteInt32ToBuf(ptr, current->year,  4, 0, '-');
 			++UBX_read;
+
+			Log_WriteHex64ToBuf(hash, siphash24(ptr, hash - ptr - 17, key));
 
 			f_puts(ptr, &Main_file);
 			UBX_state = st_flush_1;
