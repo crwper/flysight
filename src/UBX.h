@@ -31,6 +31,8 @@ extern uint16_t  UBX_rate;
 
 extern char      UBX_buf[150];
 
+extern char      UBX_key[16];
+
 void UBX_Init(void);
 void UBX_Task(void);
 void UBX_Update(void);

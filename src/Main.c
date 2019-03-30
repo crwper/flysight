@@ -29,6 +29,7 @@
 #include "Board/LEDs.h"
 #include "Lib/MMC.h"
 #include "Config.h"
+#include "Key.h"
 #include "Log.h"
 #include "Main.h"
 #include "Power.h"
@@ -49,7 +50,7 @@
 	#define BOOTLOADER_START_ADDR (0x7800)
 #endif
 
-#define BOOTLOADER_COUNT_ADDR ((uint8_t *) 0x01)
+static uint8_t EEPROM saved_count;
 
 uint8_t Main_activeLED;
 
@@ -89,21 +90,21 @@ int main(void)
 	typedef void (*AppPtr_t) (void);
 	AppPtr_t Bootloader = (AppPtr_t) BOOTLOADER_START_ADDR; 
 
-	const uint8_t count = eeprom_read_byte(BOOTLOADER_COUNT_ADDR);
+	const uint8_t count = eeprom_read_byte(&saved_count);
 
 	DDRB |= (1 << 6) | (1 << 5);	// pull audio pins down
 	
 	if (count == 3)
 	{
-		eeprom_write_byte(BOOTLOADER_COUNT_ADDR, 0);
+		eeprom_write_byte(&saved_count, 0);
 		Bootloader();
 	}
 
 	SetupHardware();
 
-	eeprom_write_byte(BOOTLOADER_COUNT_ADDR, count + 1);
+	eeprom_write_byte(&saved_count, count + 1);
 	delay_ms(500);
-	eeprom_write_byte(BOOTLOADER_COUNT_ADDR, 0);
+	eeprom_write_byte(&saved_count, 0);
 
 	if (USB_VBUS_GetStatus())
 	{
@@ -153,6 +154,7 @@ int main(void)
 		Power_Hold();
 		Signature_Write();
 		Config_Read();
+		Key_Read();
 		Power_Release();
 				
 		Timer_Init();

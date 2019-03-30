@@ -305,6 +305,8 @@ static enum
 }
 UBX_state = st_idle;
 
+char UBX_key[16];
+
 extern int disk_is_ready(void);
 extern uint64_t siphash24(const char *in, unsigned long inlen, const char k[16]);
 
@@ -760,8 +762,6 @@ void UBX_Init(void)
 
 void UBX_Task(void)
 {
-	static char key[16] = "abcdefghijklmnop";
-
 	unsigned int ch;
 
 	UBX_saved_t *current;
@@ -815,7 +815,7 @@ void UBX_Task(void)
 			ptr = Log_WriteInt32ToBuf(ptr, current->year,  4, 0, '-');
 			++UBX_read;
 
-			Log_WriteHex64ToBuf(hash, siphash24(ptr, hash - ptr - 17, key));
+			Log_WriteHex64ToBuf(hash, siphash24(ptr, hash - ptr - 17, UBX_key));
 
 			f_puts(ptr, &Main_file);
 			UBX_state = st_flush_1;

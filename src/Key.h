@@ -1,7 +1,7 @@
 /***************************************************************************
 **                                                                        **
 **  FlySight firmware                                                     **
-**  Copyright 2018 Michael Cooper                                         **
+**  Copyright 2019 Michael Cooper                                         **
 **                                                                        **
 **  This program is free software: you can redistribute it and/or modify  **
 **  it under the terms of the GNU General Public License as published by  **
@@ -21,19 +21,9 @@
 **  Website: http://flysight.ca/                                          **
 ****************************************************************************/
 
-#ifndef FLYSIGHT_MAIN_H
-#define FLYSIGHT_MAIN_H
+#ifndef MGC_KEY_H
+#define MGC_KEY_H
 
-#include <stdint.h>
-
-#include "FatFS/ff.h"
-
-#define EEPROM __attribute__((section(".eeprom")))
-
-#define MAIN_BUFFER_SIZE 1024
-
-extern uint8_t Main_activeLED;
-extern FIL     Main_file;
-extern uint8_t Main_buffer[MAIN_BUFFER_SIZE];
+void Key_Read(void);
 
 #endif
