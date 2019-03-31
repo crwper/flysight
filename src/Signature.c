@@ -38,6 +38,22 @@ static const char SignatureHeader[] PROGMEM = "\
 FlySight - http://flysight.ca/\r\n\
 Processor serial number: ";
 
+static const char SignatureLowFuse[] PROGMEM = "\
+\r\n\
+Low fuse bits: ";
+
+static const char SignatureLockBits[] PROGMEM = "\
+\r\n\
+Lock bits: ";
+
+static const char SignatureExtFuse[] PROGMEM = "\
+\r\n\
+Extended fuse bits: ";
+
+static const char SignatureHighFuse[] PROGMEM = "\
+\r\n\
+High fuse bits: ";
+
 static const char SignatureFooter[] PROGMEM = "\
 \r\n\
 Firmware version: " FLYSIGHT_VERSION "\r\n";
@@ -74,6 +90,30 @@ void Signature_Write(void)
         Signature_WriteHexNibble(byte & 0x0f);
     }
 
+    Signature_WriteString(SignatureLowFuse);
+    
+	uint8_t byte = boot_lock_fuse_bits_get(GET_LOW_FUSE_BITS);
+	Signature_WriteHexNibble(byte >> 4);
+	Signature_WriteHexNibble(byte & 0x0f);
+
+    Signature_WriteString(SignatureLockBits);
+    
+	byte = boot_lock_fuse_bits_get(GET_LOCK_BITS);
+	Signature_WriteHexNibble(byte >> 4);
+	Signature_WriteHexNibble(byte & 0x0f);
+
+    Signature_WriteString(SignatureExtFuse);
+    
+	byte = boot_lock_fuse_bits_get(GET_EXTENDED_FUSE_BITS);
+	Signature_WriteHexNibble(byte >> 4);
+	Signature_WriteHexNibble(byte & 0x0f);
+
+    Signature_WriteString(SignatureHighFuse);
+    
+	byte = boot_lock_fuse_bits_get(GET_HIGH_FUSE_BITS);
+	Signature_WriteHexNibble(byte >> 4);
+	Signature_WriteHexNibble(byte & 0x0f);
+    
     Signature_WriteString(SignatureFooter);
     
     f_close(&Main_file);
