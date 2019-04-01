@@ -106,13 +106,19 @@ int main(void)
 	delay_ms(500);
 	eeprom_write_byte(&saved_count, 0);
 
+	Power_Hold();
+	Signature_Write();
+	Config_Read();
+	Key_Read();
+	Power_Release();
+
 	if (USB_VBUS_GetStatus())
 	{
 		if (!Main_mmcInitialized)
 		{
 			USB_Disable();
 		}
-		
+
 		uart_init(12);
 		
 		for (;;)
@@ -151,12 +157,6 @@ int main(void)
 		}
 		LEDs_ChangeLEDs(LEDS_ALL_LEDS, Main_activeLED);
 
-		Power_Hold();
-		Signature_Write();
-		Config_Read();
-		Key_Read();
-		Power_Release();
-				
 		Timer_Init();
 		UBX_Init();
 
