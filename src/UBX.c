@@ -1110,8 +1110,14 @@ static void UBX_SpeakValue(
 	
 	// Step 3: Add units if needed, e.g., *(end_ptr++) = 'K';
 
-	switch (UBX_sp_mode)
- 	{
+	switch (UBX_speech[UBX_cur_speech].mode)
+	{
+	case SP_MODE_Horizontal_speed:
+	case SP_MODE_Vertical_speed:
+	case SP_MODE_Glide_ratio:
+	case SP_MODE_Inverse_glide_ratio:
+	case SP_MODE_Total_speed:
+		break;
 	case SP_MODE_Direction_to_destination:
 	case SP_MODE_Direction_to_bearing:
 		if(tVal < 0)			*(end_ptr++) = 'l';
@@ -1134,7 +1140,7 @@ static void UBX_SpeakValue(
 	case SP_MODE_Altitude:
 		*(end_ptr++) = (UBX_speech[UBX_cur_speech].units == UBX_UNITS_KMH) ? 'm' : 'f';
 		break;
- 	}
+	}
 
 	// Step 4: Terminate with a null
 
@@ -1728,50 +1734,6 @@ void UBX_Task(void)
 			{
 				Tone_Play("dot.wav");
 			}
-			else if (*UBX_speech_ptr == 'l')
-			{
-				Tone_Play("left.wav");
-			}
-			else if (*UBX_speech_ptr == 'r')
-			{
-				Tone_Play("right.wav");
-			}
-			else if (*UBX_speech_ptr == 'i')
-			{
-				Tone_Play("miles.wav");
-			}
-			else if (*UBX_speech_ptr == 'K')
-			{
-				Tone_Play("km.wav");
-			}
-			else if (*UBX_speech_ptr == 'm')
-			{
-				Tone_Play("meters.wav");
-			}
-			else if (*UBX_speech_ptr == 'n')
-			{
-				Tone_Play("knots.wav");
-			}
-			else if (*UBX_speech_ptr == 'f')
-			{
-				Tone_Play("feet.wav");
-			}
-			else if (*UBX_speech_ptr == 'o')
-			{
-				Tone_Play("oclock.wav");
-			}
-			else if (*UBX_speech_ptr == 'a')
-			{
-				Tone_Play("10.wav");
-			}
-			else if (*UBX_speech_ptr == 'b')
-			{
-				Tone_Play("11.wav");
-			}
-			else if (*UBX_speech_ptr == 'c')
-			{
-				Tone_Play("12.wav");
-			}
 			else if (*UBX_speech_ptr == 'h')
 			{
 				Tone_Play("00.wav");
@@ -1779,6 +1741,14 @@ void UBX_Task(void)
 			else if (*UBX_speech_ptr == 'k')
 			{
 				Tone_Play("000.wav");
+			}
+			else if (*UBX_speech_ptr == 'm')
+			{
+				Tone_Play("meters.wav");
+			}
+			else if (*UBX_speech_ptr == 'f')
+			{
+				Tone_Play("feet.wav");
 			}
 			else if (*UBX_speech_ptr == 't')
 			{
@@ -1833,6 +1803,42 @@ void UBX_Task(void)
 						Tone_Play("dive.wav");
 						break;
 				}
+			}
+			else if (*UBX_speech_ptr == 'l')
+			{
+				Tone_Play("left.wav");
+			}
+			else if (*UBX_speech_ptr == 'r')
+			{
+				Tone_Play("right.wav");
+			}
+			else if (*UBX_speech_ptr == 'i')
+			{
+				Tone_Play("miles.wav");
+			}
+			else if (*UBX_speech_ptr == 'K')
+			{
+				Tone_Play("km.wav");
+			}
+			else if (*UBX_speech_ptr == 'n')
+			{
+				Tone_Play("knots.wav");
+			}
+			else if (*UBX_speech_ptr == 'o')
+			{
+				Tone_Play("oclock.wav");
+			}
+			else if (*UBX_speech_ptr == 'a')
+			{
+				Tone_Play("10.wav");
+			}
+			else if (*UBX_speech_ptr == 'b')
+			{
+				Tone_Play("11.wav");
+			}
+			else if (*UBX_speech_ptr == 'c')
+			{
+				Tone_Play("12.wav");
 			}
 			else
 			{
