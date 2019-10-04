@@ -1102,11 +1102,8 @@ static void UBX_SpeakValue(
 	
 	// Step 2: Truncate to the desired number of decimal places
 
-	if (UBX_speech[UBX_cur_speech].mode != 5)
-	{
-		if (UBX_speech[UBX_cur_speech].decimals == 0) end_ptr -= 4;
-		else end_ptr -= 3 - UBX_speech[UBX_cur_speech].decimals;
-	}
+	if (UBX_speech[UBX_cur_speech].decimals == 0) end_ptr -= 4;
+	else end_ptr -= 3 - UBX_speech[UBX_cur_speech].decimals;
 	
 	// Step 3: Add units if needed, e.g., *(end_ptr++) = 'K';
 
