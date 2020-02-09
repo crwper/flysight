@@ -1,5 +1,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "i2cmaster.h"
 #include "UBX.h"
@@ -22,7 +24,7 @@ static void LCD_Command(
 	uint8_t c) 
 {
 	uint8_t packet[2];
-	
+
 	packet[0] = 0x00;			// Control Byte; C0_bit=0, D/C_bit=0 -> following Data Byte contains command
 	packet[1] = c;				// Data Byte: the command to be executed by the display
 	LCD_SendPacket(packet, 2);	// transmits the two bytes
@@ -32,7 +34,7 @@ static void LCD_Data(
 	uint8_t d) 
 {
 	uint8_t packet[2];
-	
+
 	packet[0] = 0x40;			// Control Byte; C0_bit=0, D/C_bit=1 -> following Data Byte contains data
 	packet[1] = d;				// Data Byte: the character to be displayed
 	LCD_SendPacket(packet, 2);	// transmits the two bytes
@@ -49,8 +51,6 @@ static void LCD_WriteString(
 
 void LCD_Init(void)
 {
-    unsigned char ret;
-
 	DDRD |= (1 << 4);	// reset
 	_delay_ms(100);		// delay
 
@@ -100,17 +100,47 @@ void LCD_Task(void)
 void LCD_Update(
 	UBX_saved_t *current)
 {
-	LCD_Command(0x84);	// line 1
+	char temp[17];
+	char line1[17];
+	char line2[17];
+	char *ptr;
+
+	uint8_t len, i;
+
+	int32_t alt = current->hMSL - UBX_dz_elev;
+
 	if (current->gpsFix == 0x03)
 	{
-		LCD_WriteString("      Fix       ");
+		len = sprintf(temp, "%ld m", alt / 1000);
+
+		ptr = line1;
+		for (i = 0; i < (16 - len) / 2; ++i)
+		{
+			*(ptr++) = ' ';
+		}
+
+		strcpy(ptr, temp);
+		ptr += strlen(temp);
+
+		for (i = 0; i < (16 - len + 1) / 2; ++i)
+		{
+			*(ptr++) = ' ';
+		}
+
+		*(ptr++) = 0;
+
+		strcpy(line2, "                ");
 	}
 	else
 	{
-		LCD_WriteString("     No Fix     ");
+		strcpy(line1, "     No Fix     ");
+		strcpy(line2, "                ");
 	}
+
+	LCD_Command(0x84);	// line 1
+	LCD_WriteString(line1);
 	LCD_Command(0xC4);	// line 2
-	LCD_WriteString("                ");
+	LCD_WriteString(line2);
 /*
 	LCD_Command(0x84);	// line 1
 	LCD_WriteString("     10750 m    ");

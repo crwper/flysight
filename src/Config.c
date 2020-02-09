@@ -56,10 +56,15 @@ Model:     7     ; Dynamic model\r\n\
                  ;   6 = Airborne with < 1 G acceleration\r\n\
                  ;   7 = Airborne with < 2 G acceleration\r\n\
                  ;   8 = Airborne with < 4 G acceleration\r\n\
-Rate:      200   ; Measurement rate (ms)\r\n";
+Rate:      200   ; Measurement rate (ms)\r\n\
+\r\n\
+; Competition settings\r\n\
+\r\n\
+DZ_Elev:       0 ; Ground elevation (m above sea level)\r\n";
 
 static const char Config_Model[] PROGMEM      = "Model";
 static const char Config_Rate[] PROGMEM       = "Rate";
+static const char Config_DZ_Elev[] PROGMEM    = "DZ_Elev";
 
 char Config_buf[80];
 
@@ -112,6 +117,7 @@ static FRESULT Config_ReadSingle(
 
 		HANDLE_VALUE(Config_Model,     UBX_model,        val, val >= 0 && val <= 8);
 		HANDLE_VALUE(Config_Rate,      UBX_rate,         val, val >= 100);
+		HANDLE_VALUE(Config_DZ_Elev,   UBX_dz_elev,      val * 1000, TRUE);
 		
 		#undef HANDLE_VALUE
 	}

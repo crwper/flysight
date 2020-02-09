@@ -58,6 +58,7 @@ UBX_saved_t ;
 
 extern uint8_t   UBX_model;
 extern uint16_t  UBX_rate;
+extern int32_t   UBX_dz_elev;
 
 extern char      UBX_buf[150];
 
