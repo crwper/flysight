@@ -30,6 +30,7 @@
 #include "Lib/MMC.h"
 #include "Config.h"
 #include "Key.h"
+#include "LCD.h"
 #include "Log.h"
 #include "Main.h"
 #include "Power.h"
@@ -159,10 +160,12 @@ int main(void)
 
 		Timer_Init();
 		UBX_Init();
+		LCD_Init();
 
 		for (;;)
 		{
 			UBX_Task();
+			LCD_Task();
 		}
 	}
 }

@@ -40,11 +40,13 @@ SRC          = src/Main.c                                                  \
 	           src/Debug.c                                                 \
 	           src/Descriptors.c                                           \
 	           src/Key.c                                                   \
+	           src/LCD.c                                                   \
 	           src/Log.c                                                   \
 	           src/Power.c                                                 \
 	           src/Signature.c                                             \
 	           src/Time.c                                                  \
 	           src/Timer.c                                                 \
+			   src/twimaster.c                                             \
 	           src/uart.c                                                  \
 	           src/UBX.c                                                   \
 	           src/UsbInterface.c                                          \
