@@ -60,8 +60,8 @@ void LCD_Init(void)
 
 	PORTD |= 0x03;		// internal pull-ups for SCL and SDA
 
-	DDRD |= (1 << 4) ;	// reset
-	_delay_ms(1);		// delay
+	DDRD |= (1 << 4);	// reset
+	_delay_ms(100);		// delay
 
 	i2c_init();
 
