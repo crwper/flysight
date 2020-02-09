@@ -2,6 +2,7 @@
 #include <util/delay.h>
 
 #include "i2cmaster.h"
+#include "UBX.h"
 
 static void LCD_SendPacket(
 	uint8_t *data,
@@ -46,19 +47,9 @@ static void LCD_WriteString(
 	}
 }
 
-static void LCD_Test(void)
-{
-	LCD_Command(0x84);	// return home
-	LCD_WriteString("     10750 m    ");
-	LCD_Command(0xC4);	// line 2
-	LCD_WriteString(" ------*------- ");
-}
-
 void LCD_Init(void)
 {
     unsigned char ret;
-
-	PORTD |= 0x03;		// internal pull-ups for SCL and SDA
 
 	DDRD |= (1 << 4);	// reset
 	_delay_ms(100);		// delay
@@ -99,11 +90,31 @@ void LCD_Init(void)
 	LCD_Command(0x80);	// set DDRAM address to 0x00
 	LCD_Command(0x0C);	// display ON
 	_delay_ms(100);		// delay
-	
-	LCD_Test();
 }
 
 void LCD_Task(void)
 {
 	
+}
+
+void LCD_Update(
+	UBX_saved_t *current)
+{
+	LCD_Command(0x84);	// line 1
+	if (current->gpsFix == 0x03)
+	{
+		LCD_WriteString("      Fix       ");
+	}
+	else
+	{
+		LCD_WriteString("     No Fix     ");
+	}
+	LCD_Command(0xC4);	// line 2
+	LCD_WriteString("                ");
+/*
+	LCD_Command(0x84);	// line 1
+	LCD_WriteString("     10750 m    ");
+	LCD_Command(0xC4);	// line 2
+	LCD_WriteString(" ------*------- ");
+*/
 }
