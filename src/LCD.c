@@ -10,13 +10,13 @@ static void LCD_SendPacket(
 	uint8_t *data,
 	uint8_t size)
 {
-	i2c_start(0x78);	// set device address and write mode
-
-	while (size--)
+	if (!i2c_start(0x78))
 	{
-		i2c_write(*(data++));
+		while (size--)
+		{
+			i2c_write(*(data++));
+		}
 	}
-
 	i2c_stop();
 }
 
