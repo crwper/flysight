@@ -134,12 +134,18 @@ void LCD_Update(
 	char *ptr;
 
 	uint8_t len, i;
+	uint8_t top, bot;
 
 	int32_t alt = current->hMSL - UBX_dz_elev;
+	int32_t top_alt = alt + 2 * (int32_t) current->vAcc;
+	int32_t bot_alt = alt - 2 * (int32_t) current->vAcc;
+	
+	uint8_t flag_low = 0;
+	uint8_t flag_high = 0;
 
 	if (current->gpsFix == 0x03)
 	{
-		len = sprintf(temp, "%ld m", alt / 1000);
+		len = sprintf(temp, "%ld ft", (alt * 10) / 3048);
 
 		ptr = line1;
 		for (i = 0; i < (16 - len) / 2; ++i)
@@ -157,7 +163,56 @@ void LCD_Update(
 
 		*(ptr++) = 0;
 
-		strcpy(line2, "                ");
+		if (bot_alt < UBX_exit_bot)
+		{
+			bot = 0;
+			flag_low = 1;
+		}
+		else if (bot_alt < UBX_exit_top)
+		{
+			bot = (14 * (bot_alt - UBX_exit_bot)) / (UBX_exit_top - UBX_exit_bot);
+		}
+		else
+		{
+			bot = 14;
+		}
+		
+		if (top_alt >= UBX_exit_top)
+		{
+			top = 14;
+			flag_high = 1;
+		}
+		else if (top_alt >= UBX_exit_bot)
+		{
+			top = (14 * (top_alt - UBX_exit_bot)) / (UBX_exit_top - UBX_exit_bot) + 1;
+		}
+		else
+		{
+			top = 0;
+		}
+
+		ptr = line2;
+		
+		if (flag_low) *(ptr++) = '<';
+		else          *(ptr++) = ' ';
+		
+		for (i = 0; i < bot; ++i)
+		{
+			*(ptr++) = '-';
+		}
+		
+		for (i = bot; i < top; ++i)
+		{
+			*(ptr++) = '*';
+		}
+		
+		for (i = top; i < 14; ++i)
+		{
+			*(ptr++) = '-';
+		}
+		
+		if (flag_high) *(ptr++) = '>';
+		else           *(ptr++) = ' ';
 	}
 	else
 	{

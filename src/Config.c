@@ -60,11 +60,15 @@ Rate:      200   ; Measurement rate (ms)\r\n\
 \r\n\
 ; Competition settings\r\n\
 \r\n\
-DZ_Elev:       0 ; Ground elevation (m above sea level)\r\n";
+DZ_Elev:       0 ; Ground elevation (m above sea level)\r\n\
+Exit_Top:   3353 ; Top of exit window (m above ground level)\r\n\
+Exit_Bot:   3200 ; Bottom of exit window (m above ground level)\r\n";
 
 static const char Config_Model[] PROGMEM      = "Model";
 static const char Config_Rate[] PROGMEM       = "Rate";
 static const char Config_DZ_Elev[] PROGMEM    = "DZ_Elev";
+static const char Config_Exit_Top[] PROGMEM   = "Exit_Top";
+static const char Config_Exit_Bot[] PROGMEM   = "Exit_Bot";
 
 char Config_buf[80];
 
@@ -118,6 +122,8 @@ static FRESULT Config_ReadSingle(
 		HANDLE_VALUE(Config_Model,     UBX_model,        val, val >= 0 && val <= 8);
 		HANDLE_VALUE(Config_Rate,      UBX_rate,         val, val >= 100);
 		HANDLE_VALUE(Config_DZ_Elev,   UBX_dz_elev,      val * 1000, TRUE);
+		HANDLE_VALUE(Config_Exit_Top,  UBX_exit_top,     val * 1000, TRUE);
+		HANDLE_VALUE(Config_Exit_Bot,  UBX_exit_bot,     val * 1000, TRUE);
 		
 		#undef HANDLE_VALUE
 	}
