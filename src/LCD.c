@@ -3,41 +3,65 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "i2cmaster.h"
 #include "UBX.h"
+
+#define LCD_CLK_PORT  PORTD
+#define LCD_CLK_PIN   0
+#define LCD_DATA_PORT PORTD
+#define LCD_DATA_PIN  1
+
+#define LCD_CLK_LO    LCD_CLK_PORT  &= ~(1<<LCD_CLK_PIN)
+#define LCD_CLK_HI    LCD_CLK_PORT  |=  (1<<LCD_CLK_PIN)
+#define LCD_DATA_LO   LCD_DATA_PORT &= ~(1<<LCD_DATA_PIN)
+#define LCD_DATA_HI   LCD_DATA_PORT |=  (1<<LCD_DATA_PIN)
+
+static void LCD_SendByte(
+	uint8_t data)
+{
+	uint8_t i;
+
+	for (i = 0; i < 8; ++i)
+	{
+		if (data & 0x01) LCD_DATA_HI;
+		else             LCD_DATA_LO;
+
+		LCD_CLK_LO;
+		LCD_CLK_HI;
+
+		data >>= 1;
+	}
+}
 
 static void LCD_SendPacket(
 	uint8_t *data,
 	uint8_t size)
 {
-	if (!i2c_start(0x78))
+	while (size--)
 	{
-		while (size--)
-		{
-			i2c_write(*(data++));
-		}
+		LCD_SendByte(*(data++));
 	}
-	i2c_stop();
 }
 
 static void LCD_Command(
 	uint8_t c) 
 {
-	uint8_t packet[2];
+	uint8_t packet[3];
 
-	packet[0] = 0x00;			// Control Byte; C0_bit=0, D/C_bit=0 -> following Data Byte contains command
-	packet[1] = c;				// Data Byte: the command to be executed by the display
-	LCD_SendPacket(packet, 2);	// transmits the two bytes
+	packet[0] = 0x1F;			// Control Byte; C0_bit=0, D/C_bit=0 -> following Data Byte contains command
+	packet[1] = (c & 0x0F);		// Data Byte: the command to be executed by the display
+	packet[2] = (c & 0xF0) >> 4;
+	LCD_SendPacket(packet, 3);	// transmits the three bytes
 }
 
 static void LCD_Data(
 	uint8_t d) 
 {
-	uint8_t packet[2];
+	uint8_t packet[3];
 
-	packet[0] = 0x40;			// Control Byte; C0_bit=0, D/C_bit=1 -> following Data Byte contains data
-	packet[1] = d;				// Data Byte: the character to be displayed
-	LCD_SendPacket(packet, 2);	// transmits the two bytes
+	packet[0] = 0x5F;			// Control Byte; C0_bit=0, D/C_bit=1 -> following Data Byte contains data
+	packet[1] = (d & 0x0F);		// Data Byte: the character to be displayed
+	packet[2] = (d & 0xF0) >> 4;
+	LCD_SendPacket(packet, 3);	// transmits the three bytes
 }
 
 static void LCD_WriteString(
@@ -51,10 +75,14 @@ static void LCD_WriteString(
 
 void LCD_Init(void)
 {
+	LCD_CLK_HI;
+	LCD_DATA_HI;
+
+	DDRD |= (1<<LCD_CLK_PIN);
+	DDRD |= (1<<LCD_DATA_PIN);
+
 	DDRD |= (1 << 4);	// reset
 	_delay_ms(100);		// delay
-
-	i2c_init();
 
 	PORTD |= (1 << 4);	// reset HIGH – inactive
 	_delay_ms(1);		// delay
