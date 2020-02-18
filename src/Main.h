@@ -32,6 +32,10 @@
 
 #define MAIN_BUFFER_SIZE 1024
 
+#define CHARGE_INIT        0
+#define CHARGE_CHARGING    1
+#define CHARGE_COMPLETE    2
+
 extern uint8_t Main_activeLED;
 extern FIL     Main_file;
 extern uint8_t Main_buffer[MAIN_BUFFER_SIZE];

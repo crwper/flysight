@@ -60,6 +60,9 @@ static FATFS    Main_fs;
        uint8_t  Main_buffer[MAIN_BUFFER_SIZE];
 
 static uint8_t Main_mmcInitialized;
+	
+static uint8_t Main_charge_state;
+static uint8_t Main_prev_charge_state = CHARGE_INIT;
 
 static void delay_ms(
 	uint16_t ms)
@@ -121,6 +124,7 @@ int main(void)
 		}
 
 		uart_init(12);
+		LCD_Init();
 		
 		for (;;)
 		{
@@ -134,11 +138,19 @@ int main(void)
 			
 			if (CHARGE_STATUS_PIN & CHARGE_STATUS_MASK)
 			{
+				Main_charge_state = CHARGE_COMPLETE;
 				Main_activeLED = LEDS_GREEN;
 			}
 			else
 			{
+				Main_charge_state = CHARGE_CHARGING;
 				Main_activeLED = LEDS_RED;
+			}
+
+			if (Main_charge_state != Main_prev_charge_state)
+			{
+				LCD_DisplayCharge(Main_charge_state);
+				Main_prev_charge_state = Main_charge_state;
 			}
 
 			LEDs_ChangeLEDs(LEDS_ALL_LEDS, Main_activeLED);

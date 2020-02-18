@@ -554,7 +554,7 @@ static void UBX_ReceiveMessage(
 			UBX_flags &= ~UBX_HAS_FIX;
 		}
 
-		LCD_Update(current);
+		LCD_DisplayAltitude(current);
 
 		UBX_prev_flags = UBX_flags;
 

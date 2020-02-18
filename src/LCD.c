@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "Main.h"
 #include "UBX.h"
 
 #define LCD_CLK_PORT  PORTD
@@ -14,6 +15,9 @@
 #define LCD_CLK_HI    LCD_CLK_PORT  |=  (1<<LCD_CLK_PIN)
 #define LCD_DATA_LO   LCD_DATA_PORT &= ~(1<<LCD_DATA_PIN)
 #define LCD_DATA_HI   LCD_DATA_PORT |=  (1<<LCD_DATA_PIN)
+
+static char LCD_line1[17];
+static char LCD_line2[17];
 
 static void LCD_SendByte(
 	uint8_t data)
@@ -125,12 +129,10 @@ void LCD_Task(void)
 	
 }
 
-void LCD_Update(
+void LCD_DisplayAltitude(
 	UBX_saved_t *current)
 {
 	char temp[17];
-	char line1[17];
-	char line2[17];
 	char *ptr;
 
 	uint8_t len, i;
@@ -147,7 +149,7 @@ void LCD_Update(
 	{
 		len = sprintf(temp, "%ld ft", (alt * 10) / 3048);
 
-		ptr = line1;
+		ptr = LCD_line1;
 		for (i = 0; i < (16 - len) / 2; ++i)
 		{
 			*(ptr++) = ' ';
@@ -191,7 +193,7 @@ void LCD_Update(
 			top = 0;
 		}
 
-		ptr = line2;
+		ptr = LCD_line2;
 		
 		if (flag_low) *(ptr++) = '<';
 		else          *(ptr++) = ' ';
@@ -216,18 +218,37 @@ void LCD_Update(
 	}
 	else
 	{
-		strcpy(line1, "     No Fix     ");
-		strcpy(line2, "                ");
+		strcpy(LCD_line1, "     No Fix     ");
+		strcpy(LCD_line2, "                ");
 	}
 
 	LCD_Command(0x84);	// line 1
-	LCD_WriteString(line1);
+	LCD_WriteString(LCD_line1);
 	LCD_Command(0xC4);	// line 2
-	LCD_WriteString(line2);
-/*
+	LCD_WriteString(LCD_line2);
+}
+
+void LCD_DisplayCharge(
+	uint8_t charge_state)
+{
+	if (charge_state == CHARGE_INIT)
+	{
+		sprintf(LCD_line1, "                ");
+		sprintf(LCD_line2, "                ");
+	}
+	else if (charge_state == CHARGE_CHARGING)
+	{
+		sprintf(LCD_line1, "    Charging    ");
+		sprintf(LCD_line2, "                ");
+	}
+	else if (charge_state == CHARGE_COMPLETE)
+	{
+		sprintf(LCD_line1, "     Charge     ");
+		sprintf(LCD_line2, "    Complete    ");
+	}
+
 	LCD_Command(0x84);	// line 1
-	LCD_WriteString("     10750 m    ");
+	LCD_WriteString(LCD_line1);
 	LCD_Command(0xC4);	// line 2
-	LCD_WriteString(" ------*------- ");
-*/
+	LCD_WriteString(LCD_line2);
 }
