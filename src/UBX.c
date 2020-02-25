@@ -31,6 +31,7 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 
+#include "Config.h"
 #include "Board/LEDs.h"
 #include "Log.h"
 #include "Main.h"
@@ -132,7 +133,7 @@
 #define UBX_MSG_TIMEUTC     0x08
 #define UBX_MSG_ALL         (UBX_MSG_POSLLH | UBX_MSG_SOL | UBX_MSG_VELNED | UBX_MSG_TIMEUTC)
 
-#define UBX_ALT_MIN         1500UL // Minimum announced altitude (m)
+#define UBX_ALT_MIN         1500L // Minimum announced altitude (m)
 
 #define UBX_HAS_FIX         0x01
 #define UBX_FIRST_FIX       0x02
@@ -322,20 +323,20 @@ uint8_t      UBX_cur_speech = 0;
 uint16_t     UBX_sp_rate    = 0;
 
 uint8_t  UBX_alt_units     = UBX_UNITS_FEET;
-uint32_t UBX_alt_step      = 0;
+int32_t  UBX_alt_step      = 0;
 
 uint8_t  UBX_init_mode     = 0;
 char     UBX_init_filename[9];
 
 static uint16_t UBX_sp_counter = 0;
 
-uint32_t UBX_threshold     = 1000;
-uint32_t UBX_hThreshold    = 0;
+int32_t  UBX_threshold     = 1000;
+int32_t  UBX_hThreshold    = 0;
 
 UBX_alarm_t UBX_alarms[UBX_MAX_ALARMS];
 uint8_t     UBX_num_alarms   = 0;
-uint32_t    UBX_alarm_window_above = 0;
-uint32_t    UBX_alarm_window_below = 0;
+int32_t     UBX_alarm_window_above = 0;
+int32_t     UBX_alarm_window_below = 0;
 
 int32_t  UBX_dLat          = 0;
 int32_t  UBX_dLon          = 0;
@@ -368,8 +369,8 @@ typedef struct
 	int32_t  velN;     // North velocity               (cm/s)
 	int32_t  velE;     // East velocity                (cm/s)
 	int32_t  velD;     // Down velocity                (cm/s)
-	uint32_t speed;    // 3D speed                     (cm/s)
-	uint32_t gSpeed;   // Ground speed                 (cm/s)
+	int32_t  speed;    // 3D speed                     (cm/s)
+	int32_t  gSpeed;   // Ground speed                 (cm/s)
 	int32_t  heading;  // 2D heading                   (deg)
 	uint32_t sAcc;     // Speed accuracy estimate      (cm/s)
 	uint32_t cAcc;     // Heading accuracy estimate    (deg)
@@ -1040,16 +1041,16 @@ static void UBX_SpeakValue(
 			//check if above height tone should be silenced
 			if ((current->hMSL > (UBX_end_nav+UBX_dz_elev)) || (UBX_end_nav == 0))
 			{
-				UBX_sp_decimals = 0;
+				UBX_speech[UBX_cur_speech].decimals = 0;
 				tVal = calcDirection(current->lat,current->lon,current->heading);
 				UBX_speech_ptr = Log_WriteInt32ToBuf(UBX_speech_ptr, ABS(tVal)*100, 2, 1, 0);
 			}
 		}
 		break;
 	case SP_MODE_Distance_to_destination:
-		UBX_sp_decimals = 1;
+		UBX_speech[UBX_cur_speech].decimals = 1;
 		tVal = calcDistance(current->lat,current->lon,UBX_dLat,UBX_dLon);  // returns metres
-		switch (UBX_sp_units)
+		switch (UBX_speech[UBX_cur_speech].units)
 		{
 		case UBX_UNITS_KMH:
 			tVal = tVal / 10;
@@ -1068,7 +1069,7 @@ static void UBX_SpeakValue(
 		//check if above height tone should be silenced
 		if ((current->hMSL > (UBX_end_nav+UBX_dz_elev)) || (UBX_end_nav == 0))
 		{
-			UBX_sp_decimals = 0;
+			UBX_speech[UBX_cur_speech].decimals = 0;
 			tVal = calcRelBearing(UBX_bearing,current->heading);
 			UBX_speech_ptr = Log_WriteInt32ToBuf(UBX_speech_ptr, ABS(tVal)*100, 2, 1, 0);
 		}
@@ -1114,6 +1115,7 @@ static void UBX_SpeakValue(
 	case SP_MODE_Glide_ratio:
 	case SP_MODE_Inverse_glide_ratio:
 	case SP_MODE_Total_speed:
+	case SP_MODE_Dive_angle:
 		break;
 	case SP_MODE_Direction_to_destination:
 	case SP_MODE_Direction_to_bearing:
@@ -1121,7 +1123,7 @@ static void UBX_SpeakValue(
 		else if (tVal > 0)		*(end_ptr++) = 'r';
 		break;
 	case SP_MODE_Distance_to_destination:
-		switch (UBX_sp_units)
+		switch (UBX_speech[UBX_cur_speech].units)
 		{
 		case UBX_UNITS_MPH:
 			*(end_ptr++) = 'i';
@@ -1234,8 +1236,21 @@ static void UBX_UpdateAlarms(
 					strcat(UBX_buffer.filename, ".wav");
 					Tone_Play(UBX_buffer.filename);
 					break;
+				case 9: // load config
+					UBX_init_filename[0] = 0;
+					strcpy(UBX_buffer.filename, UBX_alarms[i].filename);
+					strcat(UBX_buffer.filename, ".txt");
+					Config_ReadSingle("\\config", UBX_buffer.filename);
+					if (UBX_init_filename[0])
+					{
+						strcpy(UBX_buffer.filename, UBX_init_filename);
+						strcat(UBX_buffer.filename, ".wav");
+						Tone_Play(UBX_buffer.filename);
+					}
+					break;
 				}
 				
+				*UBX_speech_ptr = 0;
 				break;
 			}
 		}
@@ -1318,7 +1333,7 @@ static void UBX_UpdateTones(
 			x1 != UBX_INVALID_VALUE && 
 			x2 != UBX_INVALID_VALUE)
 		{
-			val_2 = (int32_t) 1000 * (x2 - x0) / (2 * UBX_rate);
+			val_2 = (int32_t) 1000 * (x2 - x0) / (int32_t) (2 * UBX_rate);
 			val_2 = (int32_t) 10000 * ABS(val_2) / ABS(max_1 - min_1);
 		}
 		break;
@@ -1778,26 +1793,35 @@ void UBX_Task(void)
 				++UBX_speech_ptr;
 				switch ((*UBX_speech_ptr) - 1)
 				{
-					case 0:
+					case SP_MODE_Horizontal_speed:
 						Tone_Play("horz.wav");
 						break;
-					case 1:
+					case SP_MODE_Vertical_speed:
 						Tone_Play("vert.wav");
 						break;
-					case 2:
+					case SP_MODE_Glide_ratio:
 						Tone_Play("glide.wav");
 						break;
-					case 3:
+					case SP_MODE_Inverse_glide_ratio:
 						Tone_Play("iglide.wav");
 						break;
-					case 4:
+					case SP_MODE_Total_speed:
 						Tone_Play("speed.wav");
 						break;
-					case 5:
-						Tone_Play("alt.wav");
+					case SP_MODE_Direction_to_destination:
+						Tone_Play("directn.wav");
 						break;
-					case 11:
+					case SP_MODE_Distance_to_destination:
+						Tone_Play("distance.wav");
+						break;
+					case SP_MODE_Direction_to_bearing:
+						Tone_Play("bearing.wav");
+						break;
+					case SP_MODE_Dive_angle:
 						Tone_Play("dive.wav");
+						break;
+					case SP_MODE_Altitude:
+						Tone_Play("alt.wav");
 						break;
 				}
 			}

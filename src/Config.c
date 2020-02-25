@@ -194,7 +194,8 @@ Alarm_Type:    0 ; Alarm type\r\n\
                  ;   2 = Chirp up\r\n\
                  ;   3 = Chirp down\r\n\
                  ;   4 = Play file\r\n\
-Alarm_File:    0 ; File to be played\r\n\
+                 ;   9 = Load config\r\n\
+Alarm_File:    0 ; File to be played or loaded\r\n\
 \r\n\
 ; Altitude mode settings\r\n\
 \r\n\
@@ -297,7 +298,7 @@ static void Config_WriteString_P(
 	}
 }
 
-static FRESULT Config_ReadSingle(
+FRESULT Config_ReadSingle(
 	const char *dir,
 	const char *filename)
 {
@@ -310,13 +311,15 @@ static FRESULT Config_ReadSingle(
 
 	FRESULT res;
 
+	Tone_Stop();	// so we can use Tone_file below
+
 	res = f_chdir(dir);
 	if (res != FR_OK) return res;
 	
-	res = f_open(&Main_file, filename, FA_READ);
+	res = f_open(&Tone_file, filename, FA_READ);
 	if (res != FR_OK) return res;
 
-	while (!f_eof(&Main_file))
+	while (!f_eof(&Tone_file))
 	{
 		f_gets(UBX_buffer.buffer, sizeof(UBX_buffer.buffer), &Main_file);
 
@@ -434,12 +437,11 @@ static FRESULT Config_ReadSingle(
 		}
 		if (!strcmp_P(name, Config_Sp_Dec) && UBX_num_speech <= UBX_MAX_SPEECH)
 		{
-			result[8] = '\0';
 			UBX_speech[UBX_num_speech - 1].decimals = val;
 		}
 	}
 	
-	f_close(&Main_file);
+	f_close(&Tone_file);
 	
 	return FR_OK;
 }
@@ -453,7 +455,7 @@ void Config_Read(void)
 	if (res != FR_OK)
 	{
 		res = f_chdir("\\");
-		res = f_open(&Main_file, "config.txt", FA_WRITE | FA_CREATE_ALWAYS);
+		res = f_open(&Tone_file, "config.txt", FA_WRITE | FA_CREATE_ALWAYS);
 		if (res != FR_OK) 
 		{
 			Main_activeLED = LEDS_RED;
@@ -461,8 +463,8 @@ void Config_Read(void)
 			return ;
 		}
 
-		Config_WriteString_P(Config_default, &Main_file);
-		f_close(&Main_file);
+		Config_WriteString_P(Config_default, &Tone_file);
+		f_close(&Tone_file);
 	}
 
 	eeprom_read_block(UBX_buffer.filename, CONFIG_FNAME_ADDR, CONFIG_FNAME_LEN);
