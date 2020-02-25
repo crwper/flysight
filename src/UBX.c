@@ -253,6 +253,7 @@ uint16_t UBX_rate          = 200;
 int32_t  UBX_dz_elev       = 0;
 int32_t  UBX_exit_bot      = 3200;
 int32_t  UBX_exit_top      = 3353;
+int8_t   UBX_rotated       = 0;
 
 static uint32_t UBX_time_of_week = 0;
 static uint8_t  UBX_msg_received = 0;

@@ -19,6 +19,9 @@
 static char LCD_line1[17];
 static char LCD_line2[17];
 
+static char LCD_line1_addr = 0x80;
+static char LCD_line2_addr = 0xC0;
+
 static void LCD_SendByte(
 	uint8_t data)
 {
@@ -101,7 +104,18 @@ void LCD_Init(void)
 	LCD_Command(0x70);	// set display clock divide ratio/oscillator frequency
 	LCD_Command(0x78);	// OLED LCD_Command set disabled
 	LCD_Command(0x08);	// extended function set (2-lines)
-	LCD_Command(0x05);	// COM SEG direction
+	if (!UBX_rotated)
+	{
+		LCD_line1_addr = 0x84;
+		LCD_line2_addr = 0xC4;
+		LCD_Command(0x05);	// COM SEG direction
+	}
+	else
+	{
+		LCD_line1_addr = 0x80;
+		LCD_line2_addr = 0xC0;
+		LCD_Command(0x06);	// COM SEG direction
+	}
 	LCD_Command(0x72);	// function selection B
 	LCD_Data(0x00);		// ROM CGRAM selection
 	LCD_Command(0x2A);	// function set (extended LCD_Command set)
@@ -222,9 +236,9 @@ void LCD_DisplayAltitude(
 		strcpy(LCD_line2, "                ");
 	}
 
-	LCD_Command(0x84);	// line 1
+	LCD_Command(LCD_line1_addr);	// line 1
 	LCD_WriteString(LCD_line1);
-	LCD_Command(0xC4);	// line 2
+	LCD_Command(LCD_line2_addr);	// line 2
 	LCD_WriteString(LCD_line2);
 }
 
@@ -247,8 +261,8 @@ void LCD_DisplayCharge(
 		sprintf(LCD_line2, "    Complete    ");
 	}
 
-	LCD_Command(0x84);	// line 1
+	LCD_Command(LCD_line1_addr);	// line 1
 	LCD_WriteString(LCD_line1);
-	LCD_Command(0xC4);	// line 2
+	LCD_Command(LCD_line2_addr);	// line 2
 	LCD_WriteString(LCD_line2);
 }
