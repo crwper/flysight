@@ -27,7 +27,7 @@
 #include "FatFS/ff.h"
 
 #define CONFIG_FNAME_ADDR ((void *) 0x02)
-#define CONFIG_FNAME_LEN  (13)
+#define CONFIG_FNAME_LEN  13
 
 extern const char Config_Init_File[];
 

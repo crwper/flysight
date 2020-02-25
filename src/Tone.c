@@ -110,6 +110,8 @@ static volatile uint16_t Tone_rate = 0;
 static volatile uint8_t  Tone_flags = 0;
 static volatile uint8_t  Tone_hold  = 0;
 
+static          uint32_t Tone_wav_samples;
+
 extern int disk_is_ready(void);
 
 ISR(TIMER1_OVF_vect)
@@ -172,7 +174,7 @@ void Tone_Update(void)
 {
 	static uint16_t tone_timer = 0;
 
-	if (!Tone_hold && 0 - tone_timer < Tone_rate)
+	if (!Tone_hold && Tone_rate > 0 && 0 - tone_timer <= Tone_rate)
 	{
 		Tone_flags |= TONE_FLAGS_BEEP;
 	}
@@ -251,7 +253,9 @@ static void Tone_ReadFile(
 	uint16_t i;
 	uint8_t  val;
 
+	size = MIN(size, Tone_wav_samples);
 	f_read(&Tone_file, &Main_buffer[Tone_write % TONE_BUFFER_LEN], size, &br);
+	Tone_wav_samples -= br;
 
 	for (i = 0; i < br; ++i)
 	{
@@ -264,7 +268,7 @@ static void Tone_ReadFile(
 	{
 		Tone_write += br;
 
-		if (br != size)
+		if (Tone_wav_samples == 0)
 		{
 			Tone_flags &= ~TONE_FLAGS_LOAD;
 		}
@@ -400,27 +404,38 @@ void Tone_Beep(
 	uint32_t chirp,
 	uint16_t len)
 {
-	Tone_Stop();
-	
-	Tone_step  = ((int32_t) index * 3242 + 30212096) * TONE_SAMPLE_LEN;
-	Tone_chirp = chirp * TONE_SAMPLE_LEN * TONE_SAMPLE_LEN;
-	Tone_len   = len / TONE_SAMPLE_LEN;
-	
-	Tone_Start(TONE_MODE_BEEP);
+	if (Tone_volume < 8)
+	{
+		Tone_Stop();
+		
+		Tone_step  = ((int32_t) index * 3242 + 30212096) * TONE_SAMPLE_LEN;
+		Tone_chirp = chirp * TONE_SAMPLE_LEN * TONE_SAMPLE_LEN;
+		Tone_len   = len / TONE_SAMPLE_LEN;
+		
+		Tone_Start(TONE_MODE_BEEP);
+	}
 }
 
 void Tone_Play(
 	const char *filename)
 {
-	Tone_Stop();
+	UINT br;
 
-	f_chdir("\\audio");
-
-	if (f_open(&Tone_file, filename, FA_READ) == FR_OK)
+	if (Tone_sp_volume < 8)
 	{
-		f_lseek(&Tone_file, 44);
+		Tone_Stop();
 
-		Tone_Start(TONE_MODE_WAV);
+		f_chdir("\\audio");
+
+		if (f_open(&Tone_file, filename, FA_READ) == FR_OK)
+		{
+			f_lseek(&Tone_file, 40);
+			f_read(&Tone_file, &Tone_wav_samples, sizeof(Tone_wav_samples), &br);
+
+			f_lseek(&Tone_file, 44);
+
+			Tone_Start(TONE_MODE_WAV);
+		}
 	}
 }
 
