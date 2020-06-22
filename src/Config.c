@@ -321,7 +321,7 @@ FRESULT Config_ReadSingle(
 
 	while (!f_eof(&Tone_file))
 	{
-		f_gets(UBX_buffer.buffer, sizeof(UBX_buffer.buffer), &Main_file);
+		f_gets(UBX_buffer.buffer, sizeof(UBX_buffer.buffer), &Tone_file);
 
 		len = strcspn(UBX_buffer.buffer, ";");
 		UBX_buffer.buffer[len] = 0;
