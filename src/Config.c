@@ -474,3 +474,53 @@ void Config_Read(void)
 		res = Config_ReadSingle("\\config", UBX_buffer.filename);
 	}
 }
+
+void Config_Reset(void)
+{
+	UBX_model         = MODEL_Airborne2G;
+	UBX_rate          = 200;
+	UBX_mode          = MODE_Glide_ratio;
+	UBX_min           = 0;
+	UBX_max           = 300;
+
+	UBX_mode_2        = MODE_Change_in_Value_1;
+	UBX_min_2         = 300;
+	UBX_max_2         = 1500;
+	UBX_min_rate      = 100;
+	UBX_max_rate      = 500;
+	UBX_flatline      = 0;
+	UBX_limits        = 1;
+	UBX_use_sas       = 1;
+
+	UBX_num_speech    = 0;
+	UBX_cur_speech    = 0;
+	UBX_sp_rate       = 0;
+
+	UBX_alt_units     = UBX_UNITS_FEET;
+	UBX_alt_step      = 0;
+
+	UBX_init_mode     = 0;
+
+	UBX_threshold     = 1000;
+	UBX_hThreshold    = 0;
+
+	UBX_num_alarms    = 0;
+	UBX_alarm_window_above = 0;
+	UBX_alarm_window_below = 0;
+
+	UBX_dLat          = 0;
+	UBX_dLon          = 0;
+	UBX_bearing       = 0;
+	UBX_end_nav       = 0;
+	UBX_max_dist      = 10000;
+	UBX_min_angle     = 5;
+
+	UBX_num_windows   = 0;
+
+	UBX_dz_elev       = 0;
+
+	Tone_volume       = 2;
+	Tone_sp_volume    = 0;
+
+	Log_tz_offset     = 0;
+}

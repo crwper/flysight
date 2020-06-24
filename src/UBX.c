@@ -89,42 +89,6 @@
 #define UBX_UNITS_MPH       1
 #define UBX_UNITS_KN        2
 
-#define MODE_Horizontal_speed           0
-#define MODE_Vertical_speed             1
-#define MODE_Glide_ratio                2
-#define MODE_Inverse_glide_ratio        3
-#define MODE_Total_speed                4
-#define MODE_Direction_to_destination   5
-#define MODE_Distance_to_destination    6
-#define MODE_Direction_to_bearing       7
-#define MODE_Magnitude_of_Value_1       8
-#define MODE_Change_in_Value_1          9
-#define MODE_LeftRight                 10
-#define MODE_Dive_angle                11
-
-#define SP_MODE_Horizontal_speed           0
-#define SP_MODE_Vertical_speed             1
-#define SP_MODE_Glide_ratio                2
-#define SP_MODE_Inverse_glide_ratio        3
-#define SP_MODE_Total_speed                4
-#define SP_MODE_Direction_to_destination   5
-#define SP_MODE_Distance_to_destination    6
-#define SP_MODE_Direction_to_bearing       7
-#define SP_MODE_Dive_angle                11
-#define SP_MODE_Altitude                  12
-
-#define MODEL_Portable                  0
-#define MODEL_Stationary                2
-#define MODEL_Pedestrian                3
-#define MODEL_Automotive                4
-#define MODEL_Sea                       5
-#define MODEL_Airborne1G                6
-#define MODEL_Airborne2G                7
-#define MODEL_Airborne4G                8
-
-#define UBX_UNITS_METERS    0
-#define UBX_UNITS_FEET      1
-
 #define UBX_SAVED_LEN       4
 
 #define UBX_MSG_POSLLH      0x01
@@ -1238,10 +1202,26 @@ static void UBX_UpdateAlarms(
 					break;
 				case 9: // load config
 					UBX_init_filename[0] = 0;
-					strcpy(UBX_buffer.filename, UBX_alarms[i].filename);
-					strcat(UBX_buffer.filename, ".txt");
-					Config_ReadSingle("\\config", UBX_buffer.filename);
-					if (UBX_init_filename[0])
+
+					if (UBX_alarms[i].filename[0] != 0)
+					{
+						strcpy(UBX_buffer.filename, UBX_alarms[i].filename);
+						strcat(UBX_buffer.filename, ".txt");
+					}
+					else
+					{
+						UBX_buffer.filename[0] = 0;
+					}
+
+					Config_Reset();
+					Config_ReadSingle("\\", "config.txt");
+
+					if (UBX_buffer.filename[0] != 0)
+					{
+						Config_ReadSingle("\\config", UBX_buffer.filename);
+					}
+
+					if (UBX_init_filename[0] != 0)
 					{
 						strcpy(UBX_buffer.filename, UBX_init_filename);
 						strcat(UBX_buffer.filename, ".wav");

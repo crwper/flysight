@@ -36,6 +36,39 @@
 #define UBX_UNITS_KMH       0
 #define UBX_UNITS_MPH       1
 
+#define MODE_Horizontal_speed           0
+#define MODE_Vertical_speed             1
+#define MODE_Glide_ratio                2
+#define MODE_Inverse_glide_ratio        3
+#define MODE_Total_speed                4
+#define MODE_Direction_to_destination   5
+#define MODE_Distance_to_destination    6
+#define MODE_Direction_to_bearing       7
+#define MODE_Magnitude_of_Value_1       8
+#define MODE_Change_in_Value_1          9
+#define MODE_LeftRight                 10
+#define MODE_Dive_angle                11
+
+#define SP_MODE_Horizontal_speed           0
+#define SP_MODE_Vertical_speed             1
+#define SP_MODE_Glide_ratio                2
+#define SP_MODE_Inverse_glide_ratio        3
+#define SP_MODE_Total_speed                4
+#define SP_MODE_Direction_to_destination   5
+#define SP_MODE_Distance_to_destination    6
+#define SP_MODE_Direction_to_bearing       7
+#define SP_MODE_Dive_angle                11
+#define SP_MODE_Altitude                  12
+
+#define MODEL_Portable                  0
+#define MODEL_Stationary                2
+#define MODEL_Pedestrian                3
+#define MODEL_Automotive                4
+#define MODEL_Sea                       5
+#define MODEL_Airborne1G                6
+#define MODEL_Airborne2G                7
+#define MODEL_Airborne4G                8
+
 #define UBX_UNITS_METERS    0
 #define UBX_UNITS_FEET      1
 
@@ -94,6 +127,7 @@ extern int32_t   UBX_alarm_window_below;
 
 extern UBX_speech_t UBX_speech[UBX_MAX_SPEECH];
 extern uint8_t      UBX_num_speech;
+extern uint8_t      UBX_cur_speech;
 extern uint16_t     UBX_sp_rate;
 
 extern uint8_t   UBX_alt_units;

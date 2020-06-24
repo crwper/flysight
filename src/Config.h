@@ -35,5 +35,6 @@ extern char Config_buf[80];
 
 FRESULT Config_ReadSingle(const char *dir, const char *filename);
 void Config_Read(void);
+void Config_Reset(void);
 
 #endif
