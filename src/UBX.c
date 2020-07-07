@@ -1110,6 +1110,37 @@ static void UBX_SpeakValue(
 	*(end_ptr++) = 0;
 }
 
+static void UBX_LoadConfig(
+	const char *filename)
+{
+	UBX_init_filename[0] = 0;
+
+	if (filename[0] != 0)
+	{
+		strcpy(UBX_buffer.filename, filename);
+		strcat(UBX_buffer.filename, ".txt");
+	}
+	else
+	{
+		UBX_buffer.filename[0] = 0;
+	}
+
+	Config_Reset();
+	Config_ReadSingle("\\", "config.txt");
+
+	if (UBX_buffer.filename[0] != 0)
+	{
+		Config_ReadSingle("\\config", UBX_buffer.filename);
+	}
+
+	if (UBX_init_filename[0] != 0)
+	{
+		strcpy(UBX_buffer.filename, UBX_init_filename);
+		strcat(UBX_buffer.filename, ".wav");
+		Tone_Play(UBX_buffer.filename);
+	}
+}
+
 static void UBX_UpdateAlarms(
 	UBX_saved_t *current)
 {
@@ -1200,32 +1231,16 @@ static void UBX_UpdateAlarms(
 					strcat(UBX_buffer.filename, ".wav");
 					Tone_Play(UBX_buffer.filename);
 					break;
-				case 9: // load config
-					UBX_init_filename[0] = 0;
-
-					if (UBX_alarms[i].filename[0] != 0)
+				case 8: // load config (ascending)
+					if (current->hMSL >= UBX_prevHMSL)
 					{
-						strcpy(UBX_buffer.filename, UBX_alarms[i].filename);
-						strcat(UBX_buffer.filename, ".txt");
+						UBX_LoadConfig(UBX_alarms[i].filename);
 					}
-					else
+					break;
+				case 9: // load config (descending)
+					if (current->hMSL < UBX_prevHMSL)
 					{
-						UBX_buffer.filename[0] = 0;
-					}
-
-					Config_Reset();
-					Config_ReadSingle("\\", "config.txt");
-
-					if (UBX_buffer.filename[0] != 0)
-					{
-						Config_ReadSingle("\\config", UBX_buffer.filename);
-					}
-
-					if (UBX_init_filename[0] != 0)
-					{
-						strcpy(UBX_buffer.filename, UBX_init_filename);
-						strcat(UBX_buffer.filename, ".wav");
-						Tone_Play(UBX_buffer.filename);
+						UBX_LoadConfig(UBX_alarms[i].filename);
 					}
 					break;
 				}

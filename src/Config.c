@@ -194,7 +194,8 @@ Alarm_Type:    0 ; Alarm type\r\n\
                  ;   2 = Chirp up\r\n\
                  ;   3 = Chirp down\r\n\
                  ;   4 = Play file\r\n\
-                 ;   9 = Load config\r\n\
+                 ;   8 = Load config (ascending)\r\n\
+                 ;   9 = Load config (descending)\r\n\
 Alarm_File:    0 ; File to be played or loaded\r\n\
 \r\n\
 ; Altitude mode settings\r\n\
