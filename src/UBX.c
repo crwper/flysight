@@ -1326,7 +1326,8 @@ static void UBX_UpdateTones(
 
 		if (x0 != UBX_INVALID_VALUE && 
 			x1 != UBX_INVALID_VALUE && 
-			x2 != UBX_INVALID_VALUE)
+			x2 != UBX_INVALID_VALUE &&
+			max_1 != min_1)
 		{
 			val_2 = (int32_t) 1000 * (x2 - x0) / (int32_t) (2 * UBX_rate);
 			val_2 = (int32_t) 10000 * ABS(val_2) / ABS(max_1 - min_1);
@@ -1351,7 +1352,7 @@ static void UBX_UpdateTones(
 			{
 				for (i = 0; i < UBX_num_speech; ++i)
 				{
-					if ((UBX_speech[UBX_cur_speech].mode != 5) || 
+					if ((UBX_speech[UBX_cur_speech].mode != 12) || 
 						(current->hMSL - UBX_dz_elev >= UBX_ALT_MIN * 1000))
 					{
 						UBX_SpeakValue(current);
@@ -1625,7 +1626,7 @@ void UBX_Init(void)
 
 	for (i = 0; (i < UBX_num_speech) && !(UBX_flags & UBX_SAY_ALTITUDE); ++i)
 	{
-		if (UBX_speech[UBX_cur_speech].mode == 5)
+		if (UBX_speech[i].mode == 12)
 		{
 			UBX_flags |= UBX_SAY_ALTITUDE;
 		}
